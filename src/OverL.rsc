@@ -55,13 +55,5 @@ test bool t_str2kv2str2kv(str s1, str s2)
 	KV tc = [<cleanup(s1), cleanup(s2)>];
 	return str2kvOverL(kv2strOverL(tc)) == tc;
 }
-test bool t_kv2str2kv(KV tc)
-	= eqL(str2kvOverL(kv2strOverL(cleanup(tc))), cleanup(tc));
 test bool t_add(KV tc_, str k, str v) = size(cleanup(tc_)) < size(addPairOverL(cleanup(tc_),k,v));
 test bool t_rem(KV tc_, str k, str v) = size(cleanup(tc_)) >= size(remPairOverL(cleanup(tc_),k,v));
-test bool t_addrem(KV tc_, str k, str v)
-{
-	tc = cleanup(tc_);
-	while (<k,v> in tc) k += "!"; // only needed for exact L
-	return tc == remPairOverL(addPairOverL(tc,k,v),k,v);
-}
