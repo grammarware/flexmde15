@@ -25,31 +25,32 @@ KV addPairUnderL(KV orig, str k, str v)
 	;
 KV remPairUnderL(KV orig, str k, str v) = orig - <k,v>;
 
-test bool parseNone() = str2kvUnderL("{}") == [];
-test bool parseEmpty() = str2kvUnderL("{\"\": \"\"}") == [<"","">];
-test bool parseAB() = str2kvUnderL("{\"a\":\"b\"}") == [<"a","b">];
-test bool parseABCD() = str2kvUnderL("{\"a\":\"b\", \"c\":\"d\"}") == [<"a","b">, <"c","d">];
-test bool parseQuote() = str2kvUnderL("{\"\\\"\": \"\"}") == [<"\"","">];
-test bool validQC(KV kv) = isValidUnderL(cleanup(kv));
-test bool parseQC(str s1, str s2)
-	= str2kvUnderL("{\"<escapeQ(cleanup(s1))>\":\"<escapeQ(cleanup(s2))>\"}")
-	== [<cleanup(s1), cleanup(s2)>];
-test bool str2kv2str(str s1, str s2)
+test bool t_parseNone() = str2kvUnderL("{}") == [];
+test bool t_parseEmpty() = str2kvUnderL("{\"\": \"\"}") == [<"","">];
+test bool t_parseAB() = str2kvUnderL("{\"a\":\"b\"}") == [<"a","b">];
+test bool t_parseABCD() = str2kvUnderL("{\"a\":\"b\", \"c\":\"d\"}") == [<"a","b">, <"c","d">];
+test bool t_parseQuote() = str2kvUnderL("{\"\\\"\": \"\"}") == [<"\"","">];
+test bool t_validQC(KV kv) = isValidUnderL(cleanup(kv));
+test bool t_parseQC(str s1, str s2)
+	= eqL(str2kvUnderL("{\"<escapeQ(cleanup(s1))>\":\"<escapeQ(cleanup(s2))>\"}"),[<cleanup(s1), cleanup(s2)>]);
+test bool t_str2kv2str(str s1, str s2)
 {
 	str tc = "{\n\t\"<escapeQ(cleanup(s1))>\": \"<escapeQ(cleanup(s2))>\"\n}";
 	return kv2strUnderL(str2kvUnderL(tc)) == tc;
 }
-test bool str2kv2str2kv(str s1, str s2)
+test bool t_str2kv2str2kv(str s1, str s2)
 {
 	KV tc = [<cleanup(s1), cleanup(s2)>];
 	return eqL(str2kvUnderL(kv2strUnderL(tc)), tc);
 }
-test bool kv2str2kv(KV tc_)
+test bool t_kv2str2kv(KV tc_)
 {
 	tc = sort(cleanup(tc_));
-	return str2kvUnderL(kv2strL(tc)) == tc;
+	return eqL(str2kvUnderL(kv2strL(tc)), tc);
 }
-test bool addrem(KV tc_, str k, str v)
+test bool t_add(KV tc_, str k, str v) = size(cleanup(tc_)) < size(addPairUnderL(cleanup(tc_),k,v));
+test bool t_rem(KV tc_, str k, str v) = size(cleanup(tc_)) >= size(remPairUnderL(cleanup(tc_),k,v));
+test bool t_addrem(KV tc_, str k, str v)
 {
 	tc = cleanup(tc_);
 	if (!isValidUnderL(tc)) return true; // the precondition does not hold => nothing to do here

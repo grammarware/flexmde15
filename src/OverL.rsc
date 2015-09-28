@@ -33,32 +33,33 @@ str kv2strOverL(KV x)
 
 bool isValidOverL(KV kv) = true; // syntactic conformance is enough
 
-// TODO?
 KV addPairOverL(KV orig, str k, str v) = orig + <k,v>;
 KV remPairOverL(KV orig, str k, str v) = orig - <k,v>;
 
-test bool parseNone() = str2kvOverL("{}") == [];
-test bool parseEmpty() = str2kvOverL("{\"\": \"\"}") == [<"","">];
-test bool parseAB() = str2kvOverL("{\"a\":\"b\"}") == [<"a","b">];
-test bool parseABCD() = str2kvOverL("{\"a\":\"b\", \"c\":\"d\"}") == [<"a","b">, <"c","d">];
-test bool parseQuote() = str2kvOverL("{\"\\\"\": \"\"}") == [<"\"","">];
-test bool validQC(KV kv) = isValidOverL(kv);
-test bool parseQC(str s1, str s2)
+test bool t_parseNone() = str2kvOverL("{}") == [];
+test bool t_parseEmpty() = str2kvOverL("{\"\": \"\"}") == [<"","">];
+test bool t_parseAB() = str2kvOverL("{\"a\":\"b\"}") == [<"a","b">];
+test bool t_parseABCD() = str2kvOverL("{\"a\":\"b\", \"c\":\"d\"}") == [<"a","b">, <"c","d">];
+test bool t_parseQuote() = str2kvOverL("{\"\\\"\": \"\"}") == [<"\"","">];
+test bool t_validQC(KV kv) = isValidOverL(kv);
+test bool t_parseQC(str s1, str s2)
 	= str2kvOverL("{\"<escapeQ(cleanup(s1))>\":\"<escapeQ(cleanup(s2))>\"}")
 	== [<cleanup(s1), cleanup(s2)>];
-test bool str2kv2str(str s1, str s2)
+test bool t_str2kv2str(str s1, str s2)
 {
 	str tc = "{\n\t\"<escapeQ(cleanup(s1))>\": \"<escapeQ(cleanup(s2))>\"\n}";
 	return kv2strOverL(str2kvOverL(tc)) == tc;
 }
-test bool str2kv2str2kv(str s1, str s2)
+test bool t_str2kv2str2kv(str s1, str s2)
 {
 	KV tc = [<cleanup(s1), cleanup(s2)>];
 	return str2kvOverL(kv2strOverL(tc)) == tc;
 }
-test bool kv2str2kv(KV tc)
+test bool t_kv2str2kv(KV tc)
 	= eqL(str2kvOverL(kv2strOverL(cleanup(tc))), cleanup(tc));
-test bool addrem(KV tc_, str k, str v)
+test bool t_add(KV tc_, str k, str v) = size(cleanup(tc_)) < size(addPairOverL(cleanup(tc_),k,v));
+test bool t_rem(KV tc_, str k, str v) = size(cleanup(tc_)) >= size(remPairOverL(cleanup(tc_),k,v));
+test bool t_addrem(KV tc_, str k, str v)
 {
 	tc = cleanup(tc_);
 	while (<k,v> in tc) k += "!"; // only needed for exact L
