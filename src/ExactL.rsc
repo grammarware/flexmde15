@@ -1,7 +1,7 @@
 @contributor{Vadim Zaytsev - vadim@grammarware.net - UvA}
 module ExactL
 
-//import Prelude;
+import List; // intercalate
 import Types;
 import Testing;
 
@@ -14,10 +14,10 @@ lexical Char = ![\"] | [\\][\\\"] ;
 KV str2kvL(str x)
 {
 	L_JDN pt = parse(#start[L_JDN], x).top;
-	if (pt has kvs)
-		return [<unescapeQ("<kv.key.inner>"),unescapeQ("<kv.val.inner>")> | KVPair kv <- pt.kvs];
-	else
-		return [];
+	return
+		(pt has kvs)
+		? [<unescapeQ("<kv.key.inner>"),unescapeQ("<kv.val.inner>")> | KVPair kv <- pt.kvs]
+		: [];
 }
 
 str kv2strL(KV x)
@@ -36,8 +36,7 @@ test bool parseEmpty() = str2kvL("{\"\": \"\"}") == [<"","">];
 test bool parseAB() = str2kvL("{\"a\":\"b\"}") == [<"a","b">];
 test bool parseABCD() = str2kvL("{\"a\":\"b\", \"c\":\"d\"}") == [<"a","b">, <"c","d">];
 test bool parseQuote() = str2kvL("{\"\\\"\": \"\"}") == [<"\"","">];
-test bool validQC(KV kv)
-	= isValidExactL(kv);
+test bool validQC(KV kv) = isValidExactL(kv);
 test bool parseQC(str s1, str s2)
 	= str2kvL("{\"<escapeQ(cleanup(s1))>\":\"<escapeQ(cleanup(s2))>\"}")
 	== [<cleanup(s1), cleanup(s2)>];
@@ -49,7 +48,7 @@ test bool str2kv2str(str s1, str s2)
 test bool str2kv2str2kv(str s1, str s2)
 {
 	KV tc = [<cleanup(s1), cleanup(s2)>];
-	return str2kvL(kv2strL(tc)) == tc;
+	return eqL(str2kvL(kv2strL(tc)), tc);
 }
 test bool kv2str2kv(KV tc)
 	= str2kvL(kv2strL(cleanup(tc))) == cleanup(tc);

@@ -30,8 +30,7 @@ test bool parseEmpty() = str2kvUnderL("{\"\": \"\"}") == [<"","">];
 test bool parseAB() = str2kvUnderL("{\"a\":\"b\"}") == [<"a","b">];
 test bool parseABCD() = str2kvUnderL("{\"a\":\"b\", \"c\":\"d\"}") == [<"a","b">, <"c","d">];
 test bool parseQuote() = str2kvUnderL("{\"\\\"\": \"\"}") == [<"\"","">];
-test bool validQC(KV kv)
-	= isValidUnderL(kv);
+test bool validQC(KV kv) = isValidUnderL(cleanup(kv));
 test bool parseQC(str s1, str s2)
 	= str2kvUnderL("{\"<escapeQ(cleanup(s1))>\":\"<escapeQ(cleanup(s2))>\"}")
 	== [<cleanup(s1), cleanup(s2)>];
@@ -43,7 +42,7 @@ test bool str2kv2str(str s1, str s2)
 test bool str2kv2str2kv(str s1, str s2)
 {
 	KV tc = [<cleanup(s1), cleanup(s2)>];
-	return str2kvUnderL(kv2strUnderL(tc)) == tc;
+	return eqL(str2kvUnderL(kv2strUnderL(tc)), tc);
 }
 test bool kv2str2kv(KV tc_)
 {
@@ -53,7 +52,7 @@ test bool kv2str2kv(KV tc_)
 test bool addrem(KV tc_, str k, str v)
 {
 	tc = cleanup(tc_);
-	if (!isValidUnderL(tc)) return true; // the precondition does not hold
-	println("Add (<k>,<v>) to <tc>...");
+	if (!isValidUnderL(tc)) return true; // the precondition does not hold => nothing to do here
+	while (<k,v> in tc) k += "!"; // only needed for exact L or under it
 	return tc == remPairUnderL(addPairUnderL(tc,k,v),k,v);
 }
