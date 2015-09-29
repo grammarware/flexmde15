@@ -20,7 +20,7 @@ str kv2strUnderL(KV x)
 }
 
 bool isValidUnderL(KV kv)
-	= isSorted([key | <key,val> <- kv]);
+	= eqL(uniq(kv),kv) && isSorted([key | <key,val> <- kv]);
 
 KV addPairUnderL(KV orig, str k, str v)
 	= domainR(orig, {key | <key,val> <- orig, key <= k})
@@ -51,5 +51,5 @@ test bool t_str2kv2str2kv(str s1, str s2)
 	KV tc = [<cleanup(s1), cleanup(s2)>];
 	return eqL(str2kvUnderL(kv2strUnderL(tc)), tc);
 }
-test bool t_add(KV tc_, str k, str v) = size(cleanup(tc_)) < size(addPairUnderL(cleanup(tc_),k,v));
-test bool t_rem(KV tc_, str k, str v) = size(cleanup(tc_)) >= size(remPairUnderL(cleanup(tc_),k,v));
+test bool t_add(KV tc_, str k, str v) = size(cleanup(tc_)) <= size(addPairUnderL(cleanup(tc_),k,v));
+test bool t_rem(KV tc_, str k, str v) = !isValidUnderL(cleanup(tc_)) || size(cleanup(tc_)) >= size(remPairUnderL(cleanup(tc_),k,v));

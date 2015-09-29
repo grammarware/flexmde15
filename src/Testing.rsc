@@ -12,12 +12,12 @@ KV cleanup(KV kv) = uniq([<cleanup(k),cleanup(v)> | <k,v> <- kv]);
 
 bool isSorted(list[&T] xs) = sort(xs) == xs;
 
-public KV uniq([]) = [];
-public default list[&T] uniq(list[&T] a)
+KV uniq([]) = [];
+default KV uniq(KV a)
 {
-	set[&T] visited = {};
-	list[&T] res = [];
-	for (&T e <- a)
+	set[OneKV] visited = {};
+	list[OneKV] res = [];
+	for (OneKV e <- a)
 	{
 		if (e notin visited)
 		{

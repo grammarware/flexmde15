@@ -4,5 +4,6 @@ module Types
 import List;
 
 alias KV = lrel[str,str];
+alias OneKV = tuple[str,str];
 
 bool eqL(KV d1, KV d2) = isEmpty(d1 - d2) && isEmpty(d2 - d1);
